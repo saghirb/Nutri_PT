@@ -15,20 +15,22 @@ body <- dashboardBody(
     tabsetPanel(
       tabPanel("Foods", 
                h3("Compare Nutritional Composition of Food Items", align = "center"), br(),
-               box("Select one or more food items to compare",
-                   selectizeInput("ifoodItem", "",
-                                  choices = unique(nutri_tidy$foodItem),
-                                  multiple = TRUE, selected = NULL)
+               box(tags$b("Select one or more food items to compare"),
+                   selectizeInput("iFoodID", "",
+                                  choices = levels(nutriPT$foodID),
+                                  multiple = TRUE, 
+                                  selected = NULL,
+                                  options = list(placeholder = "Select Food Items"))
                ),
-               box("Select one or more nutrient",
-                   selectizeInput("iNutrient", "",
-                                  choices = unique(nutri_tidy$Nutrient),
-                                  multiple = TRUE, selected = NULL)
+               box(tags$b("Select one or more nutrients"),
+                   selectizeInput("iNutrientID", "",
+                                  choices = levels(nutriPT$NutrientID),
+                                  multiple = TRUE, 
+                                  selected = NULL,
+                                  options = list(placeholder = "Select Nutrients"))
                ),
-               mainPanel(
-                 br(), br(),
-                 h1("Comparison table here", align = "center"),
-                 br(), br()
+               mainPanel(br(), 
+                 DT::dataTableOutput("CompareFood")
                )
       ),
     # Select Food Items Using Nutrient Ranges
@@ -44,6 +46,7 @@ body <- dashboardBody(
     tabPanel("About",
              h3("About Nutrition Data", align = "center"), br(),
              # Create a new row for the table.
+             box(p("Test About")),
              mainPanel(
                p("http://portfir.insa.pt/")
                ))

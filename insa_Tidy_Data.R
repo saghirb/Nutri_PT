@@ -1,6 +1,7 @@
 library(tidyverse)
 library(readxl)
 library(stringr)
+library(forcats)
 
 # Import and tidy the INSA Food Composition Data --------------------------------------------
 
@@ -53,7 +54,7 @@ nutri_long <- nutri_orig %>%
 # Create clean and tidy dataset --------------------------------------------------------------
 
 ## Prepare the Units and Quantity so that they can be merged to the Nutrient data as using
-## tidyr::spread will not give the result that we need for a tidy dataset.
+## tidyr::spread does not give the result that we need for a tidy dataset.
 nUnit <- nutri_long %>% 
   filter(grpType == "Unit") %>% 
   select(foodID, grpNtr, Unit = keyVals) 
@@ -61,6 +62,10 @@ nUnit <- nutri_long %>%
 nQty <-  nutri_long %>% 
   filter(grpType == "Quantity") %>% 
   select(foodID, grpNtr, Quantity = keyVals) 
+
+## To make filtering easier factor variables will be created for both food items and nutrients.
+## The food items have a food ID that will be the level and for nutrients we will create an ID.
+
 
 nutri_tidy <- nutri_long %>% 
   filter(grpType == "Nutrient") %>% 
@@ -74,10 +79,24 @@ nutri_tidy <- nutri_long %>%
   mutate(Nutrient = str_replace_all(Nutrient, "\\s[\\[\\]]", "_"),
          Nutrient = str_replace_all(Nutrient, "[\\]]", ""),
          Nutrient = str_replace_all(Nutrient, "\\+", "")) %>% 
-  mutate(Value = as.numeric(Value)) %>% 
-  select(foodID, foodGroup, foodItem, Nutrient, NutrientCode, Value, Unit, Quantity) %>% 
-  arrange(foodID, Nutrient)
+  mutate(Value = as.numeric(Value)) 
 
+## 
+dfoods <- nutri_tidy %>% 
+  distinct(foodID, foodItem) 
+
+dnutr <- nutri_tidy %>% 
+  distinct(Nutrient) %>% 
+  arrange(Nutrient) %>% 
+  mutate(NutrientID = row_number()) 
+
+## Final version of PT Food Composition Data
+nutriPT <- nutri_tidy %>% 
+  left_join(dnutr, by = "Nutrient") %>% 
+  mutate(foodID = factor(foodID, levels =  dfoods$foodID, labels = dfoods$foodItem)) %>% 
+  mutate(NutrientID = factor(NutrientID, levels = dnutr$NutrientID, labels = dnutr$Nutrient)) %>% 
+  select(foodID, foodGroup, foodItem, NutrientID, Nutrient, NutrientCode, Value, Unit, Quantity) %>% 
+  arrange(foodID, Nutrient)
 
 # Create a wide dataset with Nutrients in rows -----------------------------------------
 ## Useful for the Shiny App later
@@ -86,7 +105,6 @@ nutri_wide <- nutri_tidy %>%
   group_by(foodItem) %>%
   select(-foodID) %>%
   spread(foodItem, Value) 
-
 
 # MIGHT NEED THIS CODE AGAIN -----------------------------------------------------------
 # nutri_new <- nutri_tidy %>%
@@ -105,8 +123,10 @@ nutri_wide <- nutri_tidy %>%
 
 ## Saving R datasets ------------------------------------------------------------------
 save(nutri_wide, file = "data/nutri_wide.RData")
-save(nutri_tidy, file = "data/nutri_tidy.RData")
+save(nutriPT, file = "data/nutriPT.RData")
 
-rm(nQty, nUnit, nutri_long, ordNames, insaData, insaURL)
+rm(nQty, nUnit, nutri_long, ordNames, insaData, insaURL, nutri_tidy, dfoods, dnutr)
 ## Close the "stop" check for data file at the start.
 }
+
+
