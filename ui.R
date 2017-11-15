@@ -17,20 +17,21 @@ body <- dashboardBody(
                h3("Compare Nutritional Composition of Food Items", align = "center"), br(),
                box(tags$b("Select one or more food items to compare"),
                    selectizeInput("iFoodID", "",
-                                  choices = levels(nutriPT$foodID),
+                                  choices = set_names(choiceFoods$foodID, choiceFoods$foodItem),
                                   multiple = TRUE, 
                                   selected = NULL,
                                   options = list(placeholder = "Select Food Items"))
                ),
                box(tags$b("Select one or more nutrients"),
                    selectizeInput("iNutrientID", "",
-                                  choices = levels(nutriPT$NutrientID),
+                                  choices = set_names(choiceNutrients$NutrientID, choiceNutrients$Nutrient),
                                   multiple = TRUE, 
                                   selected = NULL,
                                   options = list(placeholder = "Select Nutrients"))
                ),
                mainPanel(br(), 
-                 DT::dataTableOutput("CompareFood")
+                 DT::dataTableOutput("CompareFood"),
+                 htmlOutput("inputX")
                )
       ),
     # Select Food Items Using Nutrient Ranges
