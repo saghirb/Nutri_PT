@@ -11,11 +11,12 @@ sidebar <- dashboardSidebar(disable = TRUE)
 
 body <- dashboardBody(
   fluidPage(
-    # Compare Nutritional Composition of Food Items
+    # Compare Nutritional Composition of Food Items ===============
     tabsetPanel(
       tabPanel("Foods", 
                h3("Compare Nutritional Composition of Food Items", align = "center"), br(),
                box(tags$b("Select one or more food items to compare"),
+                   status = "primary",
                    selectizeInput("iFoodID", "",
                                   choices = set_names(choiceFoods$foodID, choiceFoods$foodItem),
                                   multiple = TRUE, 
@@ -23,6 +24,7 @@ body <- dashboardBody(
                                   options = list(placeholder = "Select Food Items"))
                ),
                box(tags$b("Select one or more nutrients"),
+                   status = "primary",
                    selectizeInput("iNutrientID", "",
                                   choices = set_names(choiceNutrients$NutrientID, choiceNutrients$Nutrient),
                                   multiple = TRUE, 
@@ -30,13 +32,31 @@ body <- dashboardBody(
                                   options = list(placeholder = "Select Nutrients"))
                ),
                mainPanel(br(), 
-                 DT::dataTableOutput("CompareFood"),
-                 htmlOutput("inputX")
+                 DT::dataTableOutput("CompareFood")
                )
       ),
-    # Select Food Items Using Nutrient Ranges
+    # Select Food Items Using Nutrient Ranges ===============
     tabPanel("Nutrients",
-             h3("Select Food Items Using Nutrient Ranges", align = "center"), br()
+             h3("Select Food Items Using Nutrient Ranges", align = "center"), br(),
+             box(selectizeInput("nutChoice1", 
+                                "Select nutritional component",
+                                choices = set_names(choiceNutrients$NutrientID, choiceNutrients$Nutrient), 
+                                multiple = FALSE),
+                 uiOutput("nutInterval1")
+                 ),
+             
+             box(selectizeInput("nutChoice2",
+                                "Select nutritional component",
+                                choices = set_names(choiceNutrients$NutrientID, choiceNutrients$Nutrient),
+                                multiple = FALSE),
+                 uiOutput("nutInterval2")
+                 ),
+             
+             mainPanel(br(), 
+                       h1("----- THIS IS NOT WORKING YET! -----", align = "center"),
+                       br(),
+                       DT::dataTableOutput("NutriRanges")
+                       )
              ),
     
     # Create Recipes

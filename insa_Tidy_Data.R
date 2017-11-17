@@ -87,10 +87,20 @@ nutri_tidy <- nutri_long %>%
 choiceFoods <- nutri_tidy %>% 
   distinct(foodID, foodItem) 
 
+# choiceNutrients <- nutri_tidy %>% 
+#   distinct(Nutrient) %>% 
+#   arrange(Nutrient) %>% 
+#   mutate(NutrientID = row_number()) 
+
+# For nutrients adding ranges as they are useful for defining sliders
+
 choiceNutrients <- nutri_tidy %>% 
-  distinct(Nutrient) %>% 
-  arrange(Nutrient) %>% 
-  mutate(NutrientID = row_number()) 
+  group_by(Nutrient) %>% 
+  summarise(min = min(Value, na.rm = TRUE),
+            max = max(Value, na.rm = TRUE)) %>% 
+  mutate(NutrientID = row_number()) %>% 
+  select(NutrientID, Nutrient, min, max)
+
 
 ## Final version of PT Food Composition Data
 nutriPT <- nutri_tidy %>% 
@@ -132,7 +142,7 @@ save(nutriPT, file = "data/nutriPT.RData")
 save(choiceFoods, file = "data/choiceFoods.RData")
 save(choiceNutrients, file = "data/choiceNutrients.RData")
 
-rm(nQty, nUnit, nutri_long, ordNames, insaData, insaURL, nutri_tidy)
+rm(nQty, nUnit, nutri_long, ordNames, insaData, insaURL, nutri_tidy, nutri_orig)
 ## Close the "stop" check for data file at the start.
 }
 
