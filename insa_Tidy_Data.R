@@ -95,22 +95,20 @@ choiceFoods <- nutri_tidy %>%
 # For nutrients adding ranges as they are useful for defining sliders
 
 choiceNutrients <- nutri_tidy %>% 
-  group_by(Nutrient) %>% 
+  group_by(Nutrient, Unit, Quantity) %>% 
   summarise(min = min(Value, na.rm = TRUE),
             max = max(Value, na.rm = TRUE)) %>% 
+  ungroup() %>% 
   mutate(NutrientID = row_number()) %>% 
-  select(NutrientID, Nutrient, min, max)
+  mutate(NutrientFull = paste(Nutrient, Unit, Quantity)) %>% 
+  mutate(NutrientUQ = paste(Unit, Quantity)) %>% 
+  select(NutrientID, Nutrient, min, max, NutrientFull, NutrientUQ)
 
 
 ## Final version of PT Food Composition Data
 nutriPT <- nutri_tidy %>% 
   left_join(choiceNutrients, by = "Nutrient") %>% 
-#  mutate(foodID = factor(foodID, levels =  dfoods$foodID, labels = dfoods$foodItem)) %>% 
-#  mutate(NutrientID = factor(NutrientID, levels = dnutr$NutrientID, labels = dnutr$Nutrient)) %>% 
-  mutate(foodDisplay = set_names(foodID, foodItem)) %>% 
-  mutate(NutrientDisplay = set_names(NutrientID, Nutrient)) %>% 
-  select(foodID, foodGroup, foodItem, foodDisplay, NutrientID, Nutrient, NutrientCode, 
-         NutrientDisplay, Value, Unit, Quantity) %>% 
+  select(foodID, foodGroup, foodItem, NutrientID, NutrientCode, Nutrient, Value, Unit, Quantity) %>% 
   arrange(foodID, Nutrient)
 
 # Create a wide dataset with Nutrients in rows -----------------------------------------

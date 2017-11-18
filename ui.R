@@ -40,20 +40,22 @@ body <- dashboardBody(
              h3("Select Food Items Using Nutrient Ranges", align = "center"), br(),
              box(selectizeInput("nutChoice1", 
                                 "Select nutritional component",
-                                choices = set_names(choiceNutrients$NutrientID, choiceNutrients$Nutrient), 
+                                choices = set_names(choiceNutrients$NutrientID, choiceNutrients$NutrientFull), 
                                 multiple = FALSE),
                  uiOutput("nutInterval1")
                  ),
              
              box(selectizeInput("nutChoice2",
                                 "Select nutritional component",
-                                choices = set_names(choiceNutrients$NutrientID, choiceNutrients$Nutrient),
+                                choices = set_names(choiceNutrients$NutrientID, choiceNutrients$NutrientFull),
                                 multiple = FALSE),
                  uiOutput("nutInterval2")
                  ),
              
              mainPanel(br(), 
                        h1("----- THIS IS NOT WORKING YET! -----", align = "center"),
+                       h2(":: Intentionall broken ::", align = "center"),
+                       h2(":: Need data clarification from expert ::", align = "center"),
                        br(),
                        DT::dataTableOutput("NutriRanges")
                        )
