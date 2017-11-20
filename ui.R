@@ -38,25 +38,28 @@ body <- dashboardBody(
     # Select Food Items Using Nutrient Ranges ===============
     tabPanel("Nutrients",
              h3("Select Food Items Using Nutrient Ranges", align = "center"), br(),
-             box(selectizeInput("nutChoice1", 
-                                "Select nutritional component",
+             box(status = "primary",
+                 selectizeInput("nutChoice1", 
+                                "Select first nutrient and range:",
                                 choices = set_names(choiceNutrients$NutrientID, choiceNutrients$NutrientUnit), 
+                                selected = 15, # Hard coding to Energy (ENERCC) Kcal
                                 multiple = FALSE),
                  uiOutput("nutInterval1")
                  ),
              
-             box(selectizeInput("nutChoice2",
-                                "Select nutritional component",
+             box(status = "primary",
+                 selectizeInput("nutChoice2",
+                                "Select second nutrient and range:",
                                 choices = set_names(choiceNutrients$NutrientID, choiceNutrients$NutrientUnit),
-                                multiple = FALSE),
+                                multiple = FALSE,
+                                selected = character(0),
+                                options = list(placeholder = "Select second nutrient")),
                  uiOutput("nutInterval2")
                  ),
              
-             mainPanel(br(), 
-                       h2("----- Working with 'minor' Errors -----", align = "center"),
-                       br(),
+             mainPanel({
                        DT::dataTableOutput("NutriRanges")
-                       )
+             })
              ),
     
     # Create Recipes

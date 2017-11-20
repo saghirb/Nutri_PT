@@ -3,6 +3,7 @@ library(readxl)
 library(stringr)
 library(forcats)
 library(purrr)
+library(tibble)
 
 # Import and tidy the INSA Food Composition Data --------------------------------------------
 
@@ -94,8 +95,10 @@ choiceNutrients <- nutri_tidy %>%
   summarise(min = min(Value, na.rm = TRUE),
             max = max(Value, na.rm = TRUE)) %>%
   ungroup() %>%
+  mutate(NutrientUnit = paste(Nutrient, Unit)) %>% 
+  # Adding a "blank" row for the choices later
+  # add_row(Nutrient = " ", NutrientUnit = " ", .before = TRUE) %>% 
   mutate(NutrientID = row_number()) %>%
-  mutate(NutrientUnit = paste(Nutrient, "-", Unit)) %>% 
   select(NutrientID, NutrientUnit, Nutrient, Unit, min, max) 
 
 
