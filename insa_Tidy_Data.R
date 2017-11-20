@@ -17,9 +17,9 @@ library(purrr)
 insaURL <- "http://portfir.insa.pt/"
 insaData <- "data/insa_tca.xlsx"
 
-if(!file.exists(insaData)){
-  stop(paste("Error: Data file'", insaData, "' does not exist!\n  Download it from", insaURL))
-} else {
+ if(!file.exists(insaData)){
+   stop(paste("Error: Data file'", insaData, "' does not exist!\n  Download it from", insaURL))
+ } else {
 
 nutri_orig <- read_xlsx(insaData) 
 
@@ -87,28 +87,22 @@ nutri_tidy <- nutri_long %>%
 choiceFoods <- nutri_tidy %>% 
   distinct(foodID, foodItem) 
 
-# choiceNutrients <- nutri_tidy %>% 
-#   distinct(Nutrient) %>% 
-#   arrange(Nutrient) %>% 
-#   mutate(NutrientID = row_number()) 
-
 # For nutrients adding ranges as they are useful for defining sliders
 
-choiceNutrients <- nutri_tidy %>% 
-  group_by(Nutrient, Unit, Quantity) %>% 
+choiceNutrients <- nutri_tidy %>%
+  group_by(Nutrient, Unit) %>%
   summarise(min = min(Value, na.rm = TRUE),
-            max = max(Value, na.rm = TRUE)) %>% 
-  ungroup() %>% 
-  mutate(NutrientID = row_number()) %>% 
-  mutate(NutrientFull = paste(Nutrient, Unit, Quantity)) %>% 
-  mutate(NutrientUQ = paste(Unit, Quantity)) %>% 
-  select(NutrientID, Nutrient, min, max, NutrientFull, NutrientUQ)
+            max = max(Value, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(NutrientID = row_number()) %>%
+  mutate(NutrientUnit = paste(Nutrient, "-", Unit)) %>% 
+  select(NutrientID, NutrientUnit, Nutrient, Unit, min, max) 
 
 
 ## Final version of PT Food Composition Data
 nutriPT <- nutri_tidy %>% 
-  left_join(choiceNutrients, by = "Nutrient") %>% 
-  select(foodID, foodGroup, foodItem, NutrientID, NutrientCode, Nutrient, Value, Unit, Quantity) %>% 
+  left_join(choiceNutrients, by = c("Nutrient", "Unit")) %>% 
+  select(foodID, foodGroup, foodItem, NutrientID, NutrientCode, NutrientUnit, Nutrient, Value, Unit, Quantity) %>% 
   arrange(foodID, Nutrient)
 
 # Create a wide dataset with Nutrients in rows -----------------------------------------
@@ -141,16 +135,14 @@ save(choiceFoods, file = "data/choiceFoods.RData")
 save(choiceNutrients, file = "data/choiceNutrients.RData")
 
 rm(nQty, nUnit, nutri_long, ordNames, insaData, insaURL, nutri_tidy, nutri_orig)
-## Close the "stop" check for data file at the start.
+
+
+
+## Close the "stop" check for data file at the start =====================================
 }
 
 
 # TEST AREA: Delete at the end ===========================================================
-
-# ntx <- nutri_tidy %>% 
-#   mutate(foodDisplay = set_names(foodID, foodItem))
-# 
-# cat(names(tfood[34]))
 
 # TEST AREA: Delete at the end ===========================================================
 

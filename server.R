@@ -26,8 +26,8 @@ shinyServer(function(input, output, session) {
     # Can also set the label and select items
     updateSelectInput(session, "nutChoice2",
                       label = paste("Select nutritional component"),
-                      choices = set_names(updatedNutrients$NutrientID, updatedNutrients$NutrientFull)
-                      )
+                      choices = set_names(updatedNutrients$NutrientID, updatedNutrients$NutrientUnit)
+    )
   })
   
   output$nutInterval1 <- renderUI({
