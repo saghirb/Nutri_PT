@@ -39,10 +39,11 @@ body <- dashboardBody(
     tabPanel("Nutrients",
              h3("Select Food Items Using Nutrient Ranges", align = "center"), br(),
              box(status = "primary",
-                 selectizeInput("nutChoice1", 
+                 selectInput("nutChoice1", 
                                 "Select first nutrient and range:",
                                 choices = set_names(choiceNutrients$NutrientID, choiceNutrients$NutrientUnit), 
                                 selected = 15, # Hard coding to Energy (ENERCC) Kcal
+                                selectize = FALSE,
                                 multiple = FALSE),
                  uiOutput("nutInterval1")
                  ),
@@ -53,7 +54,8 @@ body <- dashboardBody(
                                 choices = set_names(choiceNutrients$NutrientID, choiceNutrients$NutrientUnit),
                                 multiple = FALSE,
                                 selected = character(0),
-                                options = list(placeholder = "Select second nutrient")),
+                                options = list(placeholder = "Select second nutrient")
+                             ),
                  uiOutput("nutInterval2")
                  ),
              

@@ -27,8 +27,7 @@ shinyServer(function(input, output, session) {
     updateSelectizeInput(session, "nutChoice2",
                       label = paste("Select second nutrient and range:"),
                       choices = set_names(choiceNutrients$NutrientID, choiceNutrients$NutrientUnit),
-                       selected = character(0),
-                      options = list(placeholder = "Select Second Nutrient")                      
+                      selected = character(0)
     )
   })
   
@@ -62,31 +61,27 @@ shinyServer(function(input, output, session) {
   
 
   output$NutriRanges <- renderDataTable({
-    compFood <- reactive({
+
+      compFood <- reactive({
+        req(input$nutChoice1)
+        
+      if (isTruthy(input$nutChoice1) & !isTruthy(input$nutChoice2)) {
+        nutriPT %>%
+          select(foodID, foodItem, NutrientID, NutrientUnit, Value, Quantity) %>%
+          filter((NutrientID == input$nutChoice1 & between(Value, input$nutRange1[1], input$nutRange1[2])))
+        
+      } else {
+        nutriPT %>%
+          select(foodID, foodItem, NutrientID, NutrientUnit, Value, Quantity) %>%
+          filter(NutrientID == input$nutChoice1 & between(Value, input$nutRange1[1], input$nutRange1[2]) |
+                   (NutrientID == input$nutChoice2 & between(Value, input$nutRange2[1], input$nutRange2[2]))) %>%
+          group_by(foodID) %>%
+          filter(n() == 2) %>%
+          ungroup() %>%
+          select(-foodID, -NutrientID)
+        }
+  })
       
-      nutriPT %>% 
-         select(foodID, foodItem, NutrientID, NutrientUnit, Value, Quantity) %>% 
-         filter(NutrientID == input$nutChoice1 & between(Value, input$nutRange1[1], input$nutRange1[2])) 
-      
-      
-      # if (isTruthy(input$nutChoice1) & isTruthy(input$nutChoice2)) {
-      #     # req(input$nutChoice1, input$nutChoice2)
-      #   nutriPT %>% 
-      #     select(foodID, foodItem, NutrientID, NutrientUnit, Value, Quantity) %>% 
-      #     filter((NutrientID == input$nutChoice1 & between(Value, input$nutRange1[1], input$nutRange1[2])) &
-      #     (NutrientID ==input$nutChoice2 & between(Value,  input$nutRange2[1], input$nutRange2[2]))) %>%
-      #     group_by(foodID) %>%
-      #     filter(n() == 2) %>%
-      #     ungroup() %>%
-      #     select(-foodID, -NutrientID)
-      #     } else if(isTruthy(input$nutChoice1 & !isTruthy(input$nutChoice2))){
-      #       # req(input$nutChoice1)
-      #       nutriPT %>% 
-      #         select(foodID, foodItem, NutrientID, NutrientUnit, Value, Quantity) %>% 
-      #         filter(NutrientID == input$nutChoice1 & between(Value, input$nutRange1[1], input$nutRange1[2])) 
-      #     }  
-      #       
-      })
                    
     if(nrow(compFood()) == 0){
       compFood()
