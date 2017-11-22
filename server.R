@@ -82,7 +82,6 @@ shinyServer(function(input, output, session) {
         }
   })
       
-                   
     if(nrow(compFood()) == 0){
       compFood()
     } else {
@@ -93,6 +92,73 @@ shinyServer(function(input, output, session) {
     }
   })
   
+  # Create recipes and calculate nutritional breakdown ===============
+  output$QuantitySelection <- renderUI({
+    numericInput("QuantityID",
+                 "Quantity for ingredient?", "",
+                 min = 0.1, max = 1000, width = '50%')
+    })
+
+  input_current <- reactiveValues(ingredients = NULL)
+  
+  observeEvent(input$AddIngredient, {
+    print('Update occured')
+    input_prev <- session$userData$saveIng
+    input_cur <- tibble(foodID = as.numeric(input$ingredientID), 
+                            Portion = as.numeric(input$QuantityID))
+    # NOTE: instead of a bind rows, should join and update the value instead. So that we dont get duplicates
+    input_cur <- bind_rows(input_prev, input_cur) %>% 
+      distinct(foodID, foodItem, Portion)
+    
+    session$userData$saveIng <- input_cur
+    input_current$ingredients <- input_cur
+  })
+  
+  nutri_filtered <- reactive({
+    if(is.null(input_current$ingredients)) 
+      return(NULL)
+    
+    nutriPT %>%
+      right_join(input_current$ingredients, by = "foodID") %>%
+       filter(NutrientID %in% as.numeric(isolate(input$NutrientSub))) %>%
+      mutate(Quantity = Portion,
+             Value = (Portion * Value)/100) %>%
+      select(foodID, foodItem, Quantity, Nutrient, Unit, Value)
+  })
+  
+  observe(cat("Filtered:" , nrow(nutri_filtered()), "\n"))
+  
+  nutri_sum <- reactive({
+    if(is.null(nutri_filtered())) 
+      return(NULL)
+    
+    nutri_filtered() %>%
+      group_by(Nutrient, Unit) %>%
+      summarise(Total = sum(Value)) %>%
+      right_join(nutri_filtered(), by = c("Nutrient", "Unit")) %>%
+      select(foodID, foodItem, Quantity, Nutrient, Unit, Value, Total)
+  })
+  
+  observeEvent(input$RemoveIngredient, {
+    print('Delete occured')
+    input_prev <- session$userData$saveIng
+    sel_rows <- input_prev[input$RecipeTable_rows_selected,]
+    #input_cur <- setdiff(input_prev, sel_rows) 
+    input_cur <- input_prev %>%
+      distinct(foodID, foodItem, Portion) %>%
+      anti_join(sel_rows)
+    
+    session$userData$saveIng <- input_cur
+    
+    input_current$ingredients <- input_cur
+  })
+  
+  
+  
+  output$RecipeTable <- DT::renderDataTable({
+    DT::datatable(nutri_sum(), options = list(orderClasses = TRUE))
+  })
+
   session$onSessionEnded(stopApp) 
   
 })

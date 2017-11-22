@@ -2,6 +2,7 @@
 library(shiny)
 library(shinydashboard)
 library(tidyverse)
+library(tibble)
 library(stringr)
 library(DT)
 library(ggplot2) # install with devtools::install_github('hadley/ggplot2') for compatibility with plotly

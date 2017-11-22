@@ -11,8 +11,8 @@ sidebar <- dashboardSidebar(disable = TRUE)
 
 body <- dashboardBody(
   fluidPage(
-    # Compare Nutritional Composition of Food Items ===============
     tabsetPanel(
+      # Compare Nutritional Composition of Food Items ===============
       tabPanel("Foods", 
                h3("Compare Nutritional Composition of Food Items", align = "center"), br(),
                box(tags$b("Select one or more food items to compare"),
@@ -35,6 +35,7 @@ body <- dashboardBody(
                  DT::dataTableOutput("CompareFood")
                )
       ),
+      
     # Select Food Items Using Nutrient Ranges ===============
     tabPanel("Nutrients",
              h3("Select Food Items Using Nutrient Ranges", align = "center"), br(),
@@ -64,11 +65,44 @@ body <- dashboardBody(
              })
              ),
     
-    # Create Recipes
+    # Create Recipes ===============
     tabPanel("Recipes",
-             h3("Create Recipes from Food Items", align = "center"), br()
+             h3("Nutritional Calculations for Recipes", align = "center"), br(),
+             box(status = "primary",
+                 selectizeInput("ingredientID",
+                                label = "Select ingredients",
+                                choices = set_names(choiceFoods$foodID, choiceFoods$foodItem),
+                                multiple = FALSE, 
+                                selected = NULL, 
+                                options = list(placeholder = 'Select one or more ingredients')
+                                ),
+                 
+                 uiOutput("QuantitySelection")
+             ),        
+             
+             
+             box(status = "primary",
+                 selectizeInput("NutrientSub",
+                                "Select nutrients",
+                                choices = set_names(choiceNutrients$NutrientID, choiceNutrients$Nutrient),
+                                selected = NULL,
+                                multiple = TRUE,
+                                options = list(placeholder = 'Select one or more ingredients')
+                                ) 
+                              ),
+             hr(), 
+             box(
+               actionButton("AddIngredient", "Update table", icon("refresh")),
+               actionButton("RemoveIngredient", "Delete rows", icon("erase", lib = "glyphicon"))
+             ),
+             
+             mainPanel({
+               h1("===== To be fixed =====")
+               dataTableOutput("RecipeTable")
+             })
              ),
     
+    # About tab ===============
     tabPanel("About",
              h3("About Nutrition Data", align = "center"), br(),
              # Create a new row for the table.
@@ -79,7 +113,6 @@ body <- dashboardBody(
     )
   )
 )
-
 
 
 # Shiny User Interface
