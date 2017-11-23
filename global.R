@@ -14,6 +14,24 @@ load("data/choiceFoods.RData")
 load("data/choiceNutrients.RData")
 
 
+# Setting a default nutrient choice based on filtering in case there are updates to the Nutrients
+# in the original data, i.e., this prevents hard coding a NutrientID.
+# Default for Nutrient Ranges
+defRangeNutrient <-  choiceNutrients %>% 
+  filter(str_detect(Nutrient, "ENERCC")) %>% 
+  select(NutrientID) %>% 
+  as_vector()
+
+# Default for Recipes
+defRecipeNutrients <-  choiceNutrients %>% 
+  filter(str_detect(Nutrient, "ENERCC|\\(CHO\\)|PROT")) %>% 
+  select(NutrientID) %>% 
+  as_vector()
+
+# total foodID - used to add a total for nutritients at the end
+totalFoodID <- (max(choiceFoods$foodID) * 200)
+
+  
 # Run shiny App
 # shinyApp(
 #   ui = dashboardPage(header, sidebar, body),

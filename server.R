@@ -99,15 +99,17 @@ shinyServer(function(input, output, session) {
                  min = 0.1, max = 1000, width = '50%')
     })
 
-  input_current <- reactiveValues(ingredients = NULL)
+  input_current <- reactiveValues(ingredients = NULL, nutrients = defRecipeNutrients)
   
-  observeEvent(input$AddIngredient, {
-    print('Update occured')
+  # Adding ingredients
+  observeEvent({input$addIngredient}, {
+    req(input$addIngredient)
+               
+    cat("Added foodID:", input$ingredientID)
     input_prev <- session$userData$saveIng
-    
     input_cur <- tibble(foodID = as.numeric(input$ingredientID), 
                         Portion = as.numeric(input$QuantityID))
-    # NOTE: instead of a bind rows, should join and update the value instead. So that we dont get duplicates
+
     input_cur <- bind_rows(input_prev, input_cur) %>% 
       distinct(foodID, foodItem, Portion)
     
@@ -115,26 +117,59 @@ shinyServer(function(input, output, session) {
     input_current$ingredients <- input_cur
   })
   
-  nutri_filtered <- reactive({
-    if(is.null(input_current$ingredients)) {
-      return(NULL)
+  # Nutrient updates
+  observeEvent({input$updateNutrients}, {
+    cat("\n input nuts 1:", paste(input$selectedNutrients, collapse = " "), "\n")
+    
+    #req(input$selectedNutrients)
+    
+    if(is.null(input$selectedNutrients)) {
+      input_current$nutrients <- defRecipeNutrients
+    } else {
+      input_current$nutrients <- input$selectedNutrients
     }
     
-    nutriPT %>%
+    cat("\n input nuts 2:", paste(input$selectedNutrients, collapse = " "), "\n")
+  })
+  
+  nutri_recipe <- reactive({
+    if(is.null(input_current$ingredients)) {
+      return(NULL)
+    } else {
+    
+    recipe <- nutriPT %>%
       right_join(input_current$ingredients, by = "foodID") %>%
-      filter(NutrientID %in% as.numeric(isolate(input$NutrientSub))) %>%
+      filter(NutrientID %in% input_current$nutrients) %>%
       mutate(Quantity = Portion,
              Value = (Portion * Value)/100) %>%
-      select(foodID, foodItem, Quantity, Nutrient, Unit, Value)
+      select(foodID, foodItem, Quantity, NutrientCodeUnit, Value)
+    
+      total <- recipe %>% 
+        filter(!(foodID == totalFoodID)) %>% 
+        group_by(NutrientCodeUnit) %>% 
+        summarise(sum = sum(Value)) %>% 
+        ungroup() %>% 
+        mutate(foodItem = "Recipe Total",
+               foodID = totalFoodID) %>% 
+        rename(Value = sum)
+    
+    recipe %>%
+      bind_rows(total) %>% 
+      select(-foodID) %>% 
+      spread(NutrientCodeUnit, Value)
+
+    }
+    
   })
 
+  # Remove ingredients
   observeEvent(input$RemoveIngredient, {
     print('Delete occured')
 
   observe(cat("Del: ", input$RecipeTable_rows_selected, "\n"))
 
     input_prev <- session$userData$saveIng
-    nutri_cur <- nutri_filtered()
+    nutri_cur <- nutri_recipe()
 
     
     sel_foodID <- nutri_cur[input$RecipeTable_rows_selected,] %>% 
@@ -154,21 +189,11 @@ shinyServer(function(input, output, session) {
   })
   
   output$RecipeTable <- DT::renderDataTable({
-    DT::datatable(nutri_filtered(), options = list(orderClasses = TRUE))
+    DT::datatable(nutri_recipe(), options = list(orderClasses = TRUE))
   })
 
   # Test zone ===========
-  
-  # nutri_sum <- reactive({
-  #   if(is.null(nutri_filtered())) 
-  #     return(NULL)
-  #   
-  #   nutri_filtered() %>%
-  #     group_by(Nutrient, Unit) %>%
-  #     summarise(Total = sum(Value)) %>%
-  #     right_join(nutri_filtered(), by = c("Nutrient", "Unit")) %>%
-  #     select(foodID, foodItem, Quantity, Nutrient, Unit, Value, Total)
-  # })
+
   
   # Test zone ===========
   

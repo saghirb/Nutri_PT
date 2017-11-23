@@ -8,7 +8,6 @@ header <- dashboardHeader(title = "PT Food Composition")
 sidebar <- dashboardSidebar(disable = TRUE)
 
 # Dashboard Body--- ---------------------------------------------------
-
 body <- dashboardBody(
   fluidPage(
     tabsetPanel(
@@ -43,7 +42,7 @@ body <- dashboardBody(
                  selectInput("nutChoice1", 
                                 "Select first nutrient and range:",
                                 choices = set_names(choiceNutrients$NutrientID, choiceNutrients$NutrientUnit), 
-                                selected = 15, # Hard coding to Energy (ENERCC) Kcal
+                                selected = defRangeNutrient,
                                 selectize = FALSE,
                                 multiple = FALSE),
                  uiOutput("nutInterval1")
@@ -77,22 +76,24 @@ body <- dashboardBody(
                                 options = list(placeholder = 'Select one or more ingredients')
                                 ),
                  
-                 uiOutput("QuantitySelection")
+                 uiOutput("QuantitySelection"),
+                 actionButton("addIngredient", "Add Ingredient", icon("refresh"))
              ),        
              
              
              box(status = "primary",
-                 selectizeInput("NutrientSub",
+                 selectizeInput("selectedNutrients",
                                 "Select nutrients",
                                 choices = set_names(choiceNutrients$NutrientID, choiceNutrients$Nutrient),
-                                selected = NULL,
+                                selected = defRecipeNutrients,
                                 multiple = TRUE,
                                 options = list(placeholder = 'Select one or more ingredients')
-                                ) 
+                                ),
+                 actionButton("updateNutrients", "updateNutrients", icon("refresh"))
                               ),
+             
              hr(), 
              box(
-               actionButton("AddIngredient", "Update table", icon("refresh")),
                actionButton("RemoveIngredient", "Delete rows", icon("erase", lib = "glyphicon"))
              ),
              

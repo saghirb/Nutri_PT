@@ -76,6 +76,7 @@ nutri_tidy <- nutri_long %>%
   left_join(nUnit, by = c("foodID", "grpNtr")) %>% 
   left_join(nQty, by = c("foodID", "grpNtr")) %>% 
   mutate(NutrientCode = gsub(".*\\((.*)\\).*", "\\1", Nutrient)) %>%
+  mutate(NutrientCodeUnit = paste(NutrientCode, Unit)) %>% 
   ### To make filtering easier later, remove the square brackets in Nutrient 
   ### Remove the "+" in "Mono+dissacáridos (SUGAR)"  -- DATA MISTAKE
   mutate(Nutrient = str_replace_all(Nutrient, "\\s[\\[\\]]", "_"),
@@ -105,7 +106,7 @@ choiceNutrients <- nutri_tidy %>%
 ## Final version of PT Food Composition Data
 nutriPT <- nutri_tidy %>% 
   left_join(choiceNutrients, by = c("Nutrient", "Unit")) %>% 
-  select(foodID, foodGroup, foodItem, NutrientID, NutrientCode, NutrientUnit, Nutrient, Value, Unit, Quantity) %>% 
+  select(foodID, foodGroup, foodItem, NutrientID, NutrientCode, NutrientUnit, NutrientCodeUnit, Nutrient, Value, Unit, Quantity) %>% 
   arrange(foodID, Nutrient)
 
 # Create a wide dataset with Nutrients in rows -----------------------------------------
