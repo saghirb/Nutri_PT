@@ -44,8 +44,10 @@ shinyServer(function(input, output, session) {
   })
   
   output$nutInterval2 <- renderUI({
-    if (!is.na(as.numeric(input$nutChoice2))){
-    nutRng2 = choiceNutrients %>% 
+    
+    # if (!is.na(as.numeric(input$nutChoice2))){
+    if (isTruthy(input$nutChoice2)){
+        nutRng2 = choiceNutrients %>% 
       filter(NutrientID %in% input$nutChoice2) %>%
       select(min, max) %>% 
       unlist()
