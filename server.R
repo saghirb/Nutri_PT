@@ -65,14 +65,17 @@ shinyServer(function(input, output, session) {
   output$NutriRanges <- renderDataTable({
     
       compFood <- reactive({
-        req(input$nutChoice1)
-
+        req(input$nutChoice1, input$nutRange1)
+        
       if (isTruthy(input$nutChoice1) & !isTruthy(input$nutChoice2)) {
         nutriPT %>%
           select(foodID, foodItem, NutrientID, NutrientUnit, Value, Quantity) %>%
           filter((NutrientID == input$nutChoice1 & between(Value, input$nutRange1[1], input$nutRange1[2])))
         
       } else {
+        req(input$nutRange2)
+        # req(input$nutChoice2, input$nutRange2)
+        
         nutriPT %>%
           select(foodID, foodItem, NutrientID, NutrientUnit, Value, Quantity) %>%
           filter(NutrientID == input$nutChoice1 & between(Value, input$nutRange1[1], input$nutRange1[2]) |
@@ -128,7 +131,6 @@ shinyServer(function(input, output, session) {
     })
   
   nutri_recipe <- reactive({
-    req(input_current$ingredients)
     if(!isTruthy(input_current$ingredients)) {
       return(NULL)
     } else {
