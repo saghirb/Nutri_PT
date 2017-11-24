@@ -47,10 +47,10 @@ shinyServer(function(input, output, session) {
     
     # if (!is.na(as.numeric(input$nutChoice2))){
     if (isTruthy(input$nutChoice2)){
-        nutRng2 = choiceNutrients %>% 
-      filter(NutrientID %in% input$nutChoice2) %>%
-      select(min, max) %>% 
-      unlist()
+      nutRng2 = choiceNutrients %>% 
+        filter(NutrientID %in% input$nutChoice2) %>%
+        select(min, max) %>% 
+        unlist()
     
     sliderInput("nutRange2", NULL,
                 min = nutRng2[1], 
@@ -194,11 +194,7 @@ shinyServer(function(input, output, session) {
     DT::datatable(nutri_recipe(), options = list(orderClasses = TRUE))
   })
 
-  # Test zone ===========
-
-  
-  # Test zone ===========
-  
+  # When the browser (tab) is closed end the session
   session$onSessionEnded(stopApp) 
   
 })
