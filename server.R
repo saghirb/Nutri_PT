@@ -107,13 +107,12 @@ shinyServer(function(input, output, session) {
   observeEvent({input$addIngredient}, {
     req(input$addIngredient)
                
-    cat("Added foodID:", input$ingredientID)
     input_prev <- session$userData$saveIng
     input_cur <- tibble(foodID = as.numeric(input$ingredientID), 
                         Portion = as.numeric(input$QuantityID))
 
     input_cur <- bind_rows(input_prev, input_cur) %>% 
-      distinct(foodID, foodItem, Portion)
+      distinct(foodID, Portion)
     
     session$userData$saveIng <- input_cur
     input_current$ingredients <- input_cur
@@ -121,21 +120,16 @@ shinyServer(function(input, output, session) {
   
   # Nutrient updates
   observeEvent({input$updateNutrients}, {
-    cat("\n input nuts 1:", paste(input$selectedNutrients, collapse = " "), "\n")
-    
-    #req(input$selectedNutrients)
-    
-    if(is.null(input$selectedNutrients)) {
+    if(!isTruthy(input$selectedNutrients)) {
       input_current$nutrients <- defRecipeNutrients
     } else {
       input_current$nutrients <- input$selectedNutrients
     }
-    
-    cat("\n input nuts 2:", paste(input$selectedNutrients, collapse = " "), "\n")
-  })
+    })
   
   nutri_recipe <- reactive({
-    if(is.null(input_current$ingredients)) {
+    req(input_current$ingredients)
+    if(!isTruthy(input_current$ingredients)) {
       return(NULL)
     } else {
     
@@ -155,25 +149,23 @@ shinyServer(function(input, output, session) {
                foodID = totalFoodID) %>% 
         rename(Value = sum)
     
-    recipe %>%
+    recipeWide <- recipe %>%
       bind_rows(total) %>% 
-      select(-foodID) %>% 
+      # select(-foodID) %>% 
       spread(NutrientCodeUnit, Value)
 
+    return(recipeWide)
     }
-    
   })
-
+  
   # Remove ingredients
   observeEvent(input$RemoveIngredient, {
     print('Delete occured')
-
-  observe(cat("Del: ", input$RecipeTable_rows_selected, "\n"))
+    observe(cat("Del: ", input$RecipeTable_rows_selected, "\n"))
 
     input_prev <- session$userData$saveIng
     nutri_cur <- nutri_recipe()
 
-    
     sel_foodID <- nutri_cur[input$RecipeTable_rows_selected,] %>% 
       select(foodID) %>% 
       distinct(foodID) %>% 
@@ -183,8 +175,12 @@ shinyServer(function(input, output, session) {
 
     input_cur <- nutri_cur %>%
       filter(!(foodID %in% sel_foodID)) %>% 
-      rename(Portion = Quantity) # %>% 
-      # distinct(foodID, foodItem, Portion) 
+      rename(Portion = Quantity) %>% 
+      distinct(foodID, Portion) 
+    
+    if (!isTruthy(input_cur)){
+      input_cur <- NULL
+    }
 
     session$userData$saveIng <- input_cur
     input_current$ingredients <- input_cur

@@ -93,12 +93,11 @@ body <- dashboardBody(
                               ),
              
              hr(), 
-             box(
-               actionButton("RemoveIngredient", "Delete rows", icon("erase", lib = "glyphicon"))
+             box(status = "warning",
+                 actionButton("RemoveIngredient", "Delete Food Item", icon("erase", lib = "glyphicon"))
              ),
              
              mainPanel({
-               h1("===== To be fixed =====")
                dataTableOutput("RecipeTable")
              })
              ),
