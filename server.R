@@ -142,6 +142,7 @@ shinyServer(function(input, output, session) {
              Value = (Portion * Value)/100) %>%
       select(foodID, foodItem, Quantity, NutrientCodeUnit, Value)
     
+    if (nrow(recipe) >0){
       total <- recipe %>% 
         filter(!(foodID == totalFoodID)) %>% 
         group_by(NutrientCodeUnit) %>% 
@@ -157,6 +158,10 @@ shinyServer(function(input, output, session) {
       spread(NutrientCodeUnit, Value)
 
     return(recipeWide)
+    } else {
+      return(NULL)
+    }
+    
     }
   })
   
@@ -180,9 +185,9 @@ shinyServer(function(input, output, session) {
       rename(Portion = Quantity) %>% 
       distinct(foodID, Portion) 
     
-    if (!isTruthy(input_cur)){
-      input_cur <- NULL
-    }
+    # if (!isTruthy(input_cur)){
+    #   input_cur <- ""
+    # }
 
     session$userData$saveIng <- input_cur
     input_current$ingredients <- input_cur

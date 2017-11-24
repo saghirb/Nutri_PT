@@ -92,14 +92,14 @@ body <- dashboardBody(
                  actionButton("updateNutrients", "updateNutrients", icon("refresh"))
                               ),
              
-             hr(), 
-             box(status = "warning",
-                 actionButton("RemoveIngredient", "Delete Food Item", icon("erase", lib = "glyphicon"))
-             ),
+             hr(),
              
              mainPanel({
                dataTableOutput("RecipeTable")
-             })
+             },
+             actionButton("RemoveIngredient", "Delete Food Item", icon("erase", lib = "glyphicon"))
+             )
+
              ),
     
     # About tab ===============
