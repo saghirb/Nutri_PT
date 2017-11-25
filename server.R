@@ -161,7 +161,6 @@ shinyServer(function(input, output, session) {
     } else {
       return(NULL)
     }
-    
     }
   })
   
@@ -194,7 +193,8 @@ shinyServer(function(input, output, session) {
   })
   
   output$RecipeTable <- DT::renderDataTable({
-    DT::datatable(nutri_recipe(), options = list(orderClasses = TRUE))
+    d <- nutri_recipe()
+    DT::datatable(d[, colnames(d)!="foodID"], options = list(orderClasses = TRUE))
   })
 
   # When the browser (tab) is closed end the session
