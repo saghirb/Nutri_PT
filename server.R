@@ -44,8 +44,6 @@ shinyServer(function(input, output, session) {
   })
   
   output$nutInterval2 <- renderUI({
-    
-    # if (!is.na(as.numeric(input$nutChoice2))){
     if (isTruthy(input$nutChoice2)){
       nutRng2 = choiceNutrients %>% 
         filter(NutrientID %in% input$nutChoice2) %>%
@@ -165,17 +163,10 @@ shinyServer(function(input, output, session) {
   })
   
   # Remove ingredients
-  observeEvent(input$RemoveIngredient, {
+  observeEvent(input$removeRows, {
 
     input_prev <- session$userData$saveIng
     nutri_cur <- nutri_recipe()
-
-    # sel_foodID <- nutri_cur[input$RecipeTable_rows_selected,] %>% 
-    #   select(foodID) %>% 
-    #   distinct(foodID) %>% 
-    #   as_vector()
-    
-  # observe(cat("--> sel_foodID", sel_foodID, " <-- \n"))
 
     input_cur <- nutri_cur %>%
       filter(!(row_number() %in% input$RecipeTable_rows_selected)) %>% 
@@ -186,10 +177,19 @@ shinyServer(function(input, output, session) {
     input_current$ingredients <- input_cur
   })
   
+  # Only display the "Delete Rows" button if there is data to be deleted.
+  output$removeRowsUI <- renderUI({
+    if (isTruthy(nrow(nutri_recipe()))){
+      actionButton("removeRows", "Delete Rows", icon("erase", lib = "glyphicon"))
+      } else {
+        return(NULL)
+      }
+  })
+
   output$RecipeTable <- DT::renderDataTable({
     d <- nutri_recipe()
     DT::datatable(d[, colnames(d)!="foodID"], options = list(orderClasses = TRUE))
-  })
+    })
 
   # When the browser (tab) is closed end the session
   session$onSessionEnded(stopApp) 

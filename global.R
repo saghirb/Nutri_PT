@@ -24,7 +24,7 @@ defRangeNutrient <-  choiceNutrients %>%
 
 # Default for Recipes
 defRecipeNutrients <-  choiceNutrients %>% 
-  filter(str_detect(Nutrient, "ENERCC|\\(CHO\\)|PROT")) %>% 
+  filter(str_detect(Nutrient, "ENERCC|\\(CHO\\)|PROT|\\(FAT\\)")) %>% 
   select(NutrientID) %>% 
   as_vector()
 
