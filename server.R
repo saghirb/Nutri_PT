@@ -166,28 +166,22 @@ shinyServer(function(input, output, session) {
   
   # Remove ingredients
   observeEvent(input$RemoveIngredient, {
-    print('Delete occured')
-    observe(cat("Del: ", input$RecipeTable_rows_selected, "\n"))
 
     input_prev <- session$userData$saveIng
     nutri_cur <- nutri_recipe()
 
-    sel_foodID <- nutri_cur[input$RecipeTable_rows_selected,] %>% 
-      select(foodID) %>% 
-      distinct(foodID) %>% 
-      as_vector()
+    # sel_foodID <- nutri_cur[input$RecipeTable_rows_selected,] %>% 
+    #   select(foodID) %>% 
+    #   distinct(foodID) %>% 
+    #   as_vector()
     
-  observe(cat("--> sel_foodID", sel_foodID, " <-- \n"))
+  # observe(cat("--> sel_foodID", sel_foodID, " <-- \n"))
 
     input_cur <- nutri_cur %>%
-      filter(!(foodID %in% sel_foodID)) %>% 
+      filter(!(row_number() %in% input$RecipeTable_rows_selected)) %>% 
       rename(Portion = Quantity) %>% 
       distinct(foodID, Portion) 
     
-    # if (!isTruthy(input_cur)){
-    #   input_cur <- ""
-    # }
-
     session$userData$saveIng <- input_cur
     input_current$ingredients <- input_cur
   })

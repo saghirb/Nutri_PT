@@ -1,3 +1,19 @@
+# Licenses
+
+  - Food Composition Data owned by Instituto Nacional de Saúde (INSA), Portugal
+  - R code: GPL 2.0
+
+
+# The food composition data is owned by Instituto Nacional de Saúde Dr. Ricardo Jorge, I. P.- INSA. 2016, Portugal.
+
+"Ao descarregar o ficheiro está a concordar com as condições de utilização. No que se refere à utilização dos dados, o Instituto Nacional de Saúde Doutor Ricardo Jorge, I. P. (INSA) autoriza a utilização da Tabela da Composição de Alimentos, para fins não comerciais, diretos ou indiretos, de acordo com a legislação que rege os direitos de autor, devendo constar de forma visível, no sítio onde os dados da Tabela forem inseridos, a sua fonte (Ex. - Fonte: Tabela da Composição de Alimentos. Instituto Nacional de Saúde Dr. Ricardo Jorge, I. P.- INSA. 2016 ).
+Caso os dados sejam utilizados para fins comerciais, diretos ou indiretos, será obrigatório contactar o INSA para estabelecimento de protocolo, havendo custos associados.""
+
+See http://portfir.insa.pt/ for futher information.
+
+
+# R code is licensed under the GPL 2.0
+
                     GNU GENERAL PUBLIC LICENSE
                        Version 2, June 1991
 

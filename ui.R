@@ -97,7 +97,7 @@ body <- dashboardBody(
              mainPanel({
                dataTableOutput("RecipeTable")
              },
-             actionButton("RemoveIngredient", "Delete Food Item", icon("erase", lib = "glyphicon"))
+             actionButton("RemoveIngredient", "Delete Rows", icon("erase", lib = "glyphicon"))
              )
 
              ),
