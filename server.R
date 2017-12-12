@@ -164,8 +164,6 @@ shinyServer(function(input, output, session) {
   
   # Remove ingredients
   observeEvent(input$removeRows, {
-
-    input_prev <- session$userData$saveIng
     nutri_cur <- nutri_recipe()
 
     input_cur <- nutri_cur %>%
