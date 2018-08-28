@@ -129,10 +129,11 @@ shinyServer(function(input, output, session) {
     })
   
   nutri_recipe <- reactive({
+    cat(paste(" --> (2)", input_current$ingredients))
+    
     if(!isTruthy(input_current$ingredients)) {
       return(NULL)
     } else {
-    
     recipe <- nutriPT %>%
       right_join(input_current$ingredients, by = "foodID") %>%
       filter(NutrientID %in% input_current$nutrients) %>%
@@ -140,7 +141,7 @@ shinyServer(function(input, output, session) {
              Value = (Portion * Value)/100) %>%
       select(foodID, foodItem, Quantity, NutrientCodeUnit, Value)
     
-    if (nrow(recipe) >0){
+    if (nrow(recipe) > 0){
       total <- recipe %>% 
         filter(!(foodID == totalFoodID)) %>% 
         group_by(NutrientCodeUnit) %>% 
@@ -149,13 +150,12 @@ shinyServer(function(input, output, session) {
         mutate(foodItem = "Recipe Total",
                foodID = totalFoodID) %>% 
         rename(Value = sum)
-    
-    recipeWide <- recipe %>%
-      bind_rows(total) %>% 
-      # select(-foodID) %>% 
-      spread(NutrientCodeUnit, Value)
-
-    return(recipeWide)
+      
+      recipeWide <- recipe %>%
+        bind_rows(total) %>% 
+        spread(NutrientCodeUnit, Value)
+      
+      return(recipeWide)
     } else {
       return(NULL)
     }

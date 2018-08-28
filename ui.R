@@ -89,7 +89,7 @@ body <- dashboardBody(
                                 multiple = TRUE,
                                 options = list(placeholder = 'Select one or more ingredients')
                                 ),
-                 actionButton("updateNutrients", "updateNutrients", icon("refresh"))
+                 actionButton("updateNutrients", "Update Nutrients", icon("refresh"))
                               ),
              
              hr(),
